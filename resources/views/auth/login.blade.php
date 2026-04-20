@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -99,7 +98,7 @@
 
             <!-- EMAIL / USERNAME -->
             <div class="mb-3 text-start">
-                <label class="form-label">Username / Email</label>
+                <label class="form-label">Email / NIP</label>
                 <input type="text" name="email" value="{{ old('email') }}" class="form-control" required>
             </div>
 

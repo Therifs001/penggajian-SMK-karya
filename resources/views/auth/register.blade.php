@@ -1,4 +1,50 @@
-<!DOCTYPE html>
+@extends('layouts.app')
+
+@section('content')
+    <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+        <h2 class="text-2xl font-semibold mb-4">Register</h2>
+        <form action="{{ route('register.perform') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label class="block font-medium">Nama</label>
+                <input type="text" name="name" value="{{ old('name') }}" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">NIP</label>
+                <input type="text" name="nip" value="{{ old('nip') }}" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Mata Pelajaran</label>
+                <input type="text" name="matapelajaran" value="{{ old('matapelajaran') }}" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Status</label>
+                <input type="text" name="status" value="{{ old('status') }}" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Role</label>
+                <select name="role" class="w-full border rounded p-2" required>
+                    <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru</option>
+                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Email</label>
+                <input type="email" name="email" value="{{ old('email') }}" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Password</label>
+                <input type="password" name="password" class="w-full border rounded p-2" required>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" class="w-full border rounded p-2" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">Register</button>
+        </form>
+        <p class="mt-4 text-center">Sudah punya akun? <a href="{{ route('login') }}" class="text-blue-600">Login</a></p>
+    </div>
+@endsection<!DOCTYPE html>
 <html lang="en">
 
 <head>

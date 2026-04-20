@@ -1,4 +1,96 @@
-<!DOCTYPE html>
+@extends('layouts.guru')
+
+@section('title', 'Dashboard Guru')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-4 col-12">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ auth()->user()->name }}</h3>
+                    <p>Nama Guru</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ auth()->user()->nip }}</h3>
+                    <p>NIP</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ auth()->user()->matapelajaran }}</h3>
+                    <p>Mata Pelajaran</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Absensi Hari Ini</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Gunakan tombol di bawah untuk melakukan absen hadir atau izin.</p>
+                    <a href="{{ route('guru.absensi.index') }}" class="btn btn-primary mr-2"><i class="fas fa-calendar-check mr-1"></i> Absen Hadir</a>
+                    <a href="{{ route('guru.absensi.index') }}" class="btn btn-warning"><i class="fas fa-comment-alt mr-1"></i> Izin / Alasan</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Ringkasan Gaji</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-box bg-light mb-3">
+                        <span class="info-box-icon bg-success"><i class="fas fa-wallet"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Total Gaji Terakhir</span>
+                            <span class="info-box-number">Rp 4.650.000</span>
+                        </div>
+                    </div>
+                    <div class="info-box bg-light mb-3">
+                        <span class="info-box-icon bg-info"><i class="fas fa-hand-holding-dollar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Tunjangan</span>
+                            <span class="info-box-number">Rp 550.000</span>
+                        </div>
+                    </div>
+                    <div class="info-box bg-light">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-history"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Riwayat Slip</span>
+                            <span class="info-box-number">3 Bulan Terakhir</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection@extends('layouts.app')
+
+@section('content')
+    <div class="space-y-4">
+        <a href="{{ route('guru.absensi.index') }}" class="block p-4 bg-white rounded shadow">Absensi</a>
+        <a href="{{ route('guru.gaji.index') }}" class="block p-4 bg-white rounded shadow">Riwayat Gaji</a>
+    </div>
+@endsection<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -8,16 +100,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-RXf+QSDCUqsV4K45E2p6XZh2nFQ0hHzC7QxR3uyGm5WehZ2au1V9qO2eZB4EvjwB6TQ5kx0stJZ3X3E2L1gdkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ asset('css/guru-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="guru-shell">
+    <div class="admin-shell">
         <aside class="sidebar" id="sidebar">
             <div class="brand">
                 <div class="logo">G</div>
-                <h1>Guru</h1>
-                <button id="sidebarToggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+                <div class="title">Penggajian Guru</div>
+                <button id="sidebarToggle" class="icon-btn sidebar-toggle-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
             <nav>
                 <a href="#" class="menu-link active" data-page="dashboard"><span class="icon"><i class="fas fa-chart-line"></i></span><span class="label">Dashboard</span></a>
@@ -28,8 +122,8 @@
                 <a href="{{ route('login') }}" class="menu-link"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span class="label">Logout</span></a>
             </nav>
             <div class="sidebar-footer">
-                <div class="avatar">{{ strtoupper(substr(optional(Auth::user())->name ?? 'GURU', 0, 1)) }}</div>
-                <div class="footer-text">
+                <div class="profile-avatar">{{ strtoupper(substr(optional(Auth::user())->name ?? 'GURU', 0, 1)) }}</div>
+                <div class="profile-text">
                     {{ optional(Auth::user())->name ?? 'Nama Guru' }}<br>
                     {{ optional(Auth::user())->email ?? 'guru@email.com' }}
                 </div>
@@ -37,89 +131,123 @@
         </aside>
 
         <main class="main-content" id="mainContent">
-            <div class="topbar">
-                <div class="page-heading">
+            <div class="navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
                     <div>
-                        <p class="badge primary">Halo, {{ optional(Auth::user())->name ?? 'Bapak/Ibu Guru' }}</p>
-                        <h2>Selamat datang kembali</h2>
-                        <p>Semoga harimu menyenangkan dan produktif.</p>
+                        <p class="breadcrumb"><i class="fas fa-home"></i> Dashboard Guru</p>
+                        <h2 class="heading">Penggajian Guru</h2>
                     </div>
                 </div>
-                <div class="top-actions">
-                    <button class="icon-btn" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
-                    <button class="icon-btn" title="Notifikasi"><i class="fas fa-bell"></i></button>
-                    <button class="icon-btn" title="Profil"><i class="fas fa-user-circle"></i></button>
+                <div class="navbar-right">
+                    <button class="icon-btn notification" title="Notifikasi"><i class="fas fa-bell"></i></button>
+                    <button class="icon-btn" title="Bantuan"><i class="fas fa-question-circle"></i></button>
+                    <div class="profile-menu">
+                        <div class="profile-avatar">{{ strtoupper(substr(optional(Auth::user())->name ?? 'GURU', 0, 1)) }}</div>
+                        <div class="profile-details">
+                            <span>{{ optional(Auth::user())->name ?? 'Guru' }}</span>
+                            <span>{{ optional(Auth::user())->matapelajaran ?? 'Guru Mata Pelajaran' }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <section class="section active" id="dashboard">
-                <div class="page-heading">
-                    <div>
-                        <h2>Dashboard</h2>
-                        <p>Ringkasan penggajian dan status absensi Anda.</p>
+                <div class="page-header">
+                    <div class="heading">
+                        <p class="breadcrumb"><i class="fas fa-chart-pie"></i> Ringkasan</p>
+                        <h1>Overview Penghasilan & Absensi</h1>
                     </div>
-                    <div class="badge tetapan" id="employmentStatus">Tetap</div>
+                    <button class="button primary"><i class="fas fa-file-invoice-dollar"></i> Lihat Slip</button>
                 </div>
 
-                <div class="grid grid-3">
+                <div class="grid grid-4">
                     <div class="card stat-card">
                         <div class="meta">
                             <h3>Gaji Bulan Ini</h3>
                             <strong id="dashboardSalary">Rp 4.650.000</strong>
                         </div>
-                        <div class="badge primary"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-badge dashboard"><i class="fas fa-wallet"></i></div>
                     </div>
                     <div class="card stat-card">
                         <div class="meta">
                             <h3>Total Tunjangan</h3>
                             <strong id="dashboardAllowance">Rp 550.000</strong>
                         </div>
-                        <div class="badge success"><i class="fas fa-hand-holding-dollar"></i></div>
+                        <div class="stat-badge gaji"><i class="fas fa-hand-holding-dollar"></i></div>
                     </div>
                     <div class="card stat-card">
                         <div class="meta">
-                            <h3>Total Potongan</h3>
-                            <strong id="dashboardDeduction">Rp 150.000</strong>
+                            <h3>Status Absensi</h3>
+                            <strong id="todayAttendanceStatus">Belum Absen</strong>
+                            <p>Status kehadiran hari ini.</p>
                         </div>
-                        <div class="badge warning"><i class="fas fa-minus-circle"></i></div>
+                        <div class="stat-badge aktif"><i class="fas fa-calendar-check"></i></div>
                     </div>
                 </div>
 
-                <!-- <div class="grid grid-2">
-                    <div class="card chart-card">
-                        <div class="card-header--compact">
+                <div class="grid grid-2 card-grid-top">
+                    <div class="card">
+                        <div class="card-header">
                             <div>
-                                <h3 class="card-title">Riwayat Gaji 6 Bulan</h3>
-                                <p class="card-subtitle--tight">Grafik nominal gaji bulanan Anda.</p>
+                                <h3 class="card-title">Trend Gaji 6 Bulan</h3>
+                                <p class="card-subtitle">Grafik perkembangan penghasilan Anda.</p>
                             </div>
+                            <div class="pill paid">Terakhir: Rp 4.650.000</div>
                         </div>
-                        <canvas id="salaryTrendChart"></canvas>
+                        <div class="chart-wrapper">
+                            <canvas id="salaryTrendChart"></canvas>
+                        </div>
                     </div>
                     <div class="card">
-                        <h3 class="card-title">Informasi Cepat</h3>
-                        <div class="data-panel">
-                            <div class="data-item">
-                                <span>Jabatan</span>
-                                <strong>{{ optional(Auth::user())->matapelajaran ?? 'Guru Mata Pelajaran' }}</strong>
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Slip Gaji Terbaru</h3>
+                                <p class="card-subtitle">Ringkasan pembayaran terbaru.</p>
                             </div>
-                            <div class="data-item">
-                                <span>NIP</span>
-                                <strong>{{ optional(Auth::user())->nip ?? '1234567890' }}</strong>
-                            </div>
-                            <div class="data-item">
-                                <span>Status Absensi Hari Ini</span>
-                                <strong id="todayAttendanceStatus">Belum Absen</strong>
-                            </div>
+                            <button class="button secondary"><i class="fas fa-download"></i> Unduh</button>
+                        </div>
+                        <div class="card-scroll">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Bulan</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>April 2026</td>
+                                        <td>Rp 4.650.000</td>
+                                        <td><span class="pill paid">Lunas</span></td>
+                                        <td><button class="button secondary button-small">Detail</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Maret 2026</td>
+                                        <td>Rp 4.650.000</td>
+                                        <td><span class="pill paid">Lunas</span></td>
+                                        <td><button class="button secondary button-small">Detail</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Februari 2026</td>
+                                        <td>Rp 4.650.000</td>
+                                        <td><span class="pill pending">Pending</span></td>
+                                        <td><button class="button secondary button-small">Detail</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </section>
 
             <section class="section" id="absensi">
-                <div class="page-heading">
-                    <div>
-                        <h2>Absensi</h2>
-                        <p>Catat kehadiran harian Anda dengan cepat.</p>
+                <div class="page-header">
+                    <div class="heading">
+                        <p class="breadcrumb"><i class="fas fa-calendar-check"></i> Absensi</p>
+                        <h1>Catatan Kehadiran</h1>
                     </div>
                 </div>
 
@@ -147,13 +275,13 @@
                             </div>
                             <div class="data-item">
                                 <span>Status</span>
-                                <strong id="attendanceBadge"><span class="badge danger">Belum Hadir</span></strong>
+                                <strong id="attendanceBadge"><span class="pill pending">Belum Hadir</span></strong>
                             </div>
                         </div>
 
                         <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:18px;">
-                            <button id="checkInButton" class="button success">Absen Masuk</button>
-                            <button id="checkOutButton" class="button info" disabled>Absen Pulang</button>
+                            <button id="checkInButton" class="button primary">Absen Masuk</button>
+                            <button id="checkOutButton" class="button secondary" disabled>Absen Pulang</button>
                         </div>
                     </div>
                     <div class="card">
@@ -166,6 +294,10 @@
                             <div class="data-item">
                                 <span>Foto Selfie</span>
                                 <strong>Tambahkan saat absen</strong>
+                            </div>
+                            <div class="data-item">
+                                <span>Total Kehadiran Minggu Ini</span>
+                                <strong id="weeklyAttendanceCount">0</strong>
                             </div>
                         </div>
                         <p style="margin-top:14px;color:var(--muted);">Untuk fitur lengkap, dapat ditambahkan lokasi dan bukti foto saat integrasi backend.</p>
@@ -197,10 +329,10 @@
             </section>
 
             <section class="section" id="slip-gaji">
-                <div class="page-heading">
-                    <div>
-                        <h2>Slip Gaji</h2>
-                        <p>Lihat ringkasan gaji bulan ini dan cetak PDF jika diperlukan.</p>
+                <div class="page-header">
+                    <div class="heading">
+                        <p class="breadcrumb"><i class="fas fa-file-invoice-dollar"></i> Slip Gaji</p>
+                        <h1>Rincian Gaji</h1>
                     </div>
                 </div>
 
@@ -223,16 +355,16 @@
                         </div>
                     </div>
                     <div style="margin-top:24px;display:flex;justify-content:flex-end;">
-                        <button class="button info" id="downloadSlipButton"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                        <button class="button primary" id="downloadSlipButton"><i class="fas fa-file-pdf"></i> Download PDF</button>
                     </div>
                 </div>
             </section>
 
             <section class="section" id="riwayat-gaji">
-                <div class="page-heading">
-                    <div>
-                        <h2>Riwayat Gaji</h2>
-                        <p>Daftar gaji bulanan dan status pembayaran.</p>
+                <div class="page-header">
+                    <div class="heading">
+                        <p class="breadcrumb"><i class="fas fa-history"></i> Riwayat</p>
+                        <h1>Riwayat Gaji</h1>
                     </div>
                 </div>
 
@@ -251,19 +383,19 @@
                                 <tr>
                                     <td>April 2026</td>
                                     <td>Rp 4.650.000</td>
-                                    <td><span class="badge success">Lunas</span></td>
+                                    <td><span class="pill paid">Lunas</span></td>
                                     <td><button class="button secondary">Detail</button></td>
                                 </tr>
                                 <tr>
                                     <td>Maret 2026</td>
                                     <td>Rp 4.650.000</td>
-                                    <td><span class="badge success">Lunas</span></td>
+                                    <td><span class="pill paid">Lunas</span></td>
                                     <td><button class="button secondary">Detail</button></td>
                                 </tr>
                                 <tr>
                                     <td>Februari 2026</td>
                                     <td>Rp 4.650.000</td>
-                                    <td><span class="badge warning">Pending</span></td>
+                                    <td><span class="pill pending">Pending</span></td>
                                     <td><button class="button secondary">Detail</button></td>
                                 </tr>
                             </tbody>
@@ -273,10 +405,10 @@
             </section>
 
             <section class="section" id="profil">
-                <div class="page-heading">
-                    <div>
-                        <h2>Profil Saya</h2>
-                        <p>Kelola data pribadi dan informasi kontak Anda.</p>
+                <div class="page-header">
+                    <div class="heading">
+                        <p class="breadcrumb"><i class="fas fa-user"></i> Profil</p>
+                        <h1>Profil Saya</h1>
                     </div>
                 </div>
 
@@ -383,13 +515,13 @@
         function renderAttendanceHistory() {
             const records = getAttendanceRecords();
             attendanceHistoryTable.innerHTML = records.slice(-7).reverse().map(record => {
-                const statusClass = record.status === 'Hadir' ? 'hadir' : record.status === 'Telat' ? 'telat' : 'tidak-hadir';
+                const statusClass = record.status === 'Hadir' ? 'paid' : record.status === 'Telat' ? 'pending' : 'pending';
                 return `
                     <tr>
                         <td>${record.date}</td>
                         <td>${record.checkIn || '-'}</td>
                         <td>${record.checkOut || '-'}</td>
-                        <td><span class="badge ${statusClass}">${record.status}</span></td>
+                        <td><span class="pill ${statusClass}">${record.status}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -409,13 +541,13 @@
                 attendanceIn.textContent = today.checkIn || '-';
                 attendanceOut.textContent = today.checkOut || '-';
                 todayAttendanceStatus.textContent = today.status;
-                attendanceBadge.innerHTML = `<span class="badge ${today.status === 'Hadir' ? 'hadir' : today.status === 'Telat' ? 'telat' : 'tidak-hadir'}">${today.status}</span>`;
+                attendanceBadge.innerHTML = `<span class="pill ${today.status === 'Hadir' ? 'paid' : today.status === 'Telat' ? 'pending' : 'pending'}">${today.status}</span>`;
                 checkInButton.disabled = Boolean(today.checkIn);
                 checkOutButton.disabled = !today.checkIn || Boolean(today.checkOut);
             } else {
                 attendanceIn.textContent = '-';
                 attendanceOut.textContent = '-';
-                attendanceBadge.innerHTML = `<span class="badge danger">Belum Hadir</span>`;
+                attendanceBadge.innerHTML = `<span class="pill pending">Belum Hadir</span>`;
                 todayAttendanceStatus.textContent = 'Belum Absen';
                 checkInButton.disabled = false;
                 checkOutButton.disabled = true;

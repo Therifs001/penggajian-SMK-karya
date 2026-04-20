@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Absensi;
+use App\Models\Gaji;
+use App\Models\KomponenGaji;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'nip', 'matapelajaran', 'status', 'role', 'email', 'password'])]
+#[Fillable(['name', 'nip', 'matapelajaran', 'status', 'role', 'email', 'password', 'no_hp', 'alamat'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,5 +31,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function absensi(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Absensi::class);
+    }
+
+    public function gaji(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Gaji::class);
+    }
+
+    public function komponenGaji(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(KomponenGaji::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
     }
 }

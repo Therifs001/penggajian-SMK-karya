@@ -1,53 +1,136 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Penggajian Guru</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-RXf+QSDCUqsV4K45E2p6XZh2nFQ0hHzC7QxR3uyGm5WehZ2au1V9qO2eZB4EvjwB6TQ5kx0stJZ3X3E2L1gdkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="admin-shell">
-        <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <div class="logo">PG</div>
-                <div class="title">Penggajian Guru</div>
-                <button id="sidebarToggle" class="icon-btn sidebar-toggle-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
+@extends('layouts.admin')
+
+@section('title', 'Dashboard Admin')
+
+@section('content')
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ \App\Models\User::where('role', 'guru')->count() }}</h3>
+                    <p>Jumlah Guru</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <a href="{{ route('admin.guru.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <nav>
-                <a href="#" class="menu-link active" data-page="dashboard"><span class="icon"><i class="fas fa-chart-line"></i></span><span class="label">Dashboard</span></a>
-                <a href="#" class="menu-link" data-page="data-guru"><span class="icon"><i class="fas fa-users"></i></span><span class="label">Data Guru</span></a>
-                <a href="#" class="menu-link" data-page="data-gaji"><span class="icon"><i class="fas fa-wallet"></i></span><span class="label">Data Gaji</span></a>
-                <a href="#" class="menu-link" data-page="absensi"><span class="icon"><i class="fas fa-calendar-check"></i></span><span class="label">Absensi</span></a>
-                <a href="#" class="menu-link" data-page="tunjangan"><span class="icon"><i class="fas fa-gifts"></i></span><span class="label">Tunjangan</span></a>
-                <a href="#" class="menu-link" data-page="potongan"><span class="icon"><i class="fas fa-minus-circle"></i></span><span class="label">Potongan</span></a>
-                <a href="#" class="menu-link" data-page="laporan"><span class="icon"><i class="fas fa-file-alt"></i></span><span class="label">Laporan</span></a>
-                <a href="#" class="menu-link" data-page="pengaturan"><span class="icon"><i class="fas fa-cog"></i></span><span class="label">Pengaturan</span></a>
-                <a href="{{ route('login') }}" class="menu-link"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span class="label">Logout</span></a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="profile-avatar">AD</div>
-                <div class="profile-text">
-                    <span>Admin</span>
-                    <span>Administrator</span>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ \App\Models\Gaji::count() }}</h3>
+                    <p>Total Slip Gaji</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <a href="{{ route('admin.gaji.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ \App\Models\Absensi::whereDate('tanggal', today())->count() }}</h3>
+                    <p>Absensi Hari Ini</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <a href="{{ route('admin.absensi-setting.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ \App\Models\KomponenGaji::count() }}</h3>
+                    <p>Komponen Gaji</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <a href="{{ route('admin.komponen-gaji.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="card-title">Ringkasan Gaji</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Statistik gaji dan absensi untuk membantu admin memantau performa bulanan.</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-box bg-light">
+                                <span class="info-box-icon bg-info"><i class="fas fa-user-check"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Guru Aktif</span>
+                                    <span class="info-box-number">{{ \App\Models\User::where('role', 'guru')->where('status', 'aktif')->count() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box bg-light">
+                                <span class="info-box-icon bg-success"><i class="fas fa-hand-holding-dollar"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Tunjangan</span>
+                                    <span class="info-box-number">Rp {{ number_format(\App\Models\KomponenGaji::sum('transport') + \App\Models\KomponenGaji::sum('bpjs'), 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box bg-light">
+                                <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Absensi Hari Ini</span>
+                                    <span class="info-box-number">{{ \App\Models\Absensi::whereDate('tanggal', today())->count() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <main class="main-content" id="mainContent">
-            <div class="navbar">
-                <div class="navbar-left">
-                    <button class="menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
-                    <div>
-                        <p class="breadcrumb"><i class="fas fa-home"></i> Admin Panel</p>
-                        <h2 class="heading">Dashboard Penggajian Guru</h2>
+        <div class="col-lg-4">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Action</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{{ route('admin.guru.index') }}" class="btn btn-primary btn-block mb-2"><i class="fas fa-users mr-2"></i> Kelola Guru</a>
+                    <a href="{{ route('admin.komponen-gaji.index') }}" class="btn btn-success btn-block mb-2"><i class="fas fa-money-bill-wave mr-2"></i> Komponen Gaji</a>
+                    <a href="{{ route('admin.absensi-setting.index') }}" class="btn btn-warning btn-block mb-2"><i class="fas fa-calendar-alt mr-2"></i> Atur Absensi</a>
+                    <a href="{{ route('admin.gaji.index') }}" class="btn btn-danger btn-block"><i class="fas fa-file-invoice-dollar mr-2"></i> Hitung Gaji</a>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection@extends('layouts.app')
+
+@section('content')
+    <div class="space-y-4">
+        <a href="{{ route('admin.guru.index') }}" class="block p-4 bg-white rounded shadow">Manajemen Guru</a>
+        <a href="{{ route('admin.komponen-gaji.index') }}" class="block p-4 bg-white rounded shadow">Pengaturan Komponen Gaji</a>
+        <a href="{{ route('admin.absensi-setting.index') }}" class="block p-4 bg-white rounded shadow">Pengaturan Absensi</a>
+        <a href="{{ route('admin.gaji.index') }}" class="block p-4 bg-white rounded shadow">Laporan Penggajian</a>
+    </div>
+@endsection@extends('layouts.app')
+
+@section('content')
+    <div class="space-y-4">
+        <a href="{{ route('admin.guru.index') }}" class="block p-4 bg-white rounded shadow">Manajemen Guru</a>
+        <a href="{{ route('admin.komponen-gaji.index') }}" class="block p-4 bg-white rounded shadow">Pengaturan Komponen Gaji</a>
+        <a href="{{ route('admin.absensi-setting.index') }}" class="block p-4 bg-white rounded shadow">Pengaturan Absensi</a>
+        <a href="{{ route('admin.gaji.index') }}" class="block p-4 bg-white rounded shadow">Laporan Penggajian</a>
+    </div>
+@endsection
                     </div>
                 </div>
                 <div class="navbar-right">
