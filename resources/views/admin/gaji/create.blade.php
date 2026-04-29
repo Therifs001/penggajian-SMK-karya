@@ -1,27 +1,36 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title', 'Buat Gaji')
 
 @section('content')
-    <div class="space-y-4">
-        <h2 class="text-2xl font-semibold mb-4">Buat Perhitungan Gaji</h2>
-        <form action="{{ route('admin.gaji.store') }}" method="POST" class="space-y-4 bg-white rounded shadow p-6">
+    <div class='card'>
+        <div class='card-header'>
+            <h3 class='card-title'>Buat Perhitungan Gaji</h3>
+        </div>
+        <form action="{{ route('admin.gaji.store') }}" method='POST'>
             @csrf
-            <div>
-                <label class="block font-medium">Guru</label>
-                <select name="user_id" class="w-full border rounded p-2">
-                    @foreach($gurus as $guru)
-                        <option value="{{ $guru->id }}">{{ $guru->name }} ({{ $guru->email }})</option>
-                    @endforeach
-                </select>
+            <div class='card-body'>
+                <div class='form-group'>
+                    <label>Guru</label>
+                    <select name='user_id' class='form-control' required>
+                        @foreach($gurus as $guru)
+                            <option value="{{ $guru->id }}">{{ $guru->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class='form-group'>
+                    <label>Periode</label>
+                    <input type='month' name='periode' class='form-control' required>
+                </div>
+                <div class='form-group'>
+                    <label>Jumlah Kehadiran</label>
+                    <input type='number' name='kehadiran' class='form-control' required>
+                </div>
             </div>
-            <div>
-                <label class="block font-medium">Periode (YYYY-MM)</label>
-                <input type="month" name="periode" class="w-full border rounded p-2" required>
+            <div class='card-footer'>
+                <button type='submit' class='btn btn-primary'>Hitung Gaji</button>
+                <a href="{{ route('admin.gaji.index') }}" class='btn btn-secondary'>Batal</a>
             </div>
-            <div>
-                <label class="block font-medium">Jumlah Jam Mengajar</label>
-                <input type="number" name="jam_mengajar" step="0.5" class="w-full border rounded p-2" required>
-            </div>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Hitung Gaji</button>
         </form>
     </div>
 @endsection

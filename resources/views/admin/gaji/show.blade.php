@@ -1,27 +1,28 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title', 'Slip Gaji')
 
 @section('content')
-    <div class="space-y-4">
-        <h2 class="text-2xl font-semibold mb-4">Slip Gaji - {{ $gaji->guru->name }}</h2>
-        <div class="bg-white shadow rounded p-6">
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
+    <div class='card'>
+        <div class='card-header d-flex justify-content-between align-items-center'>
+            <h3 class='card-title'>Slip Gaji - {{ $gaji->guru->name }}</h3>
+            <div>
+                <a href="{{ route('admin.gaji.slip-pdf', $gaji) }}" class='btn btn-danger' target='_blank'>
+                    <i class='fas fa-file-pdf mr-2'></i>Cetak PDF
+                </a>
+                <a href="{{ route('admin.gaji.index') }}" class='btn btn-secondary'>Kembali</a>
+            </div>
+        </div>
+        <div class='card-body'>
+            <div class='row'>
+                <div class='col-md-6'>
                     <p><strong>Periode:</strong> {{ $gaji->periode }}</p>
                     <p><strong>Jumlah Kehadiran:</strong> {{ $gaji->kehadiran }}</p>
-                    <p><strong>Jam Mengajar:</strong> {{ $gaji->jam_mengajar }}</p>
                 </div>
-                <div>
-                    <p><strong>Honor / Jam:</strong> Rp {{ number_format($gaji->honor_per_jam, 0, ',', '.') }}</p>
-                    <p><strong>Tunjangan:</strong> Rp {{ number_format($gaji->total_tunjangan, 0, ',', '.') }}</p>
-                    <p><strong>Potongan:</strong> Rp {{ number_format($gaji->total_potongan, 0, ',', '.') }}</p>
+                <div class='col-md-6'>
+                    <p><strong>Total Gaji:</strong></p>
+                    <h2 class='text-success'>Rp {{ number_format($gaji->total_gaji, 0, ',', '.') }}</h2>
                 </div>
-            </div>
-            <div class="border-t pt-4">
-                <h3 class="text-lg font-semibold mb-2">Total Gaji</h3>
-                <p class="text-2xl font-bold">Rp {{ number_format($gaji->total_gaji, 0, ',', '.') }}</p>
-            </div>
-            <div class="mt-6">
-                <a href="{{ route('admin.gaji.slip-pdf', $gaji) }}" class="inline-block px-4 py-2 bg-green-600 text-white rounded">Download PDF</a>
             </div>
         </div>
     </div>
