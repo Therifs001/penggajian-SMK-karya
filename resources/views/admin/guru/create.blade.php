@@ -20,7 +20,11 @@
                 </div>
                 <div class='form-group'>
                     <label>Mata Pelajaran</label>
-                    <input type='text' name='matapelajaran' value="{{ old('matapelajaran') }}" class='form-control' required>
+                    <select name='subjects[]' id='subjects-select' class='form-control' multiple required>
+                        @foreach($subjects as $sub)
+                            <option value="{{ $sub->id }}" {{ in_array($sub->id, old('subjects', [])) ? 'selected' : '' }}>{{ $sub->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class='form-group'>
                     <label>Status</label>
@@ -37,6 +41,10 @@
                     <label>Password</label>
                     <input type='password' name='password' class='form-control' required>
                 </div>
+                <div class='form-group'>
+                    <label>Konfirmasi Password</label>
+                    <input type='password' name='password_confirmation' class='form-control' required>
+                </div>
             </div>
             <div class='card-footer'>
                 <button type='submit' class='btn btn-primary'>Simpan</button>
@@ -44,4 +52,21 @@
             </div>
         </form>
     </div>
+@endsection
+
+@section('scripts')
+    <!-- Select2 CSS/JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#subjects-select').select2({
+                tags: true,
+                tokenSeparators: [','],
+                placeholder: '-- Pilih atau ketik Mata Pelajaran --',
+                width: '100%'
+            });
+        });
+    </script>
 @endsection

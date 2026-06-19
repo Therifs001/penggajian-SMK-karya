@@ -8,39 +8,73 @@ use Carbon\Carbon;
 
 class GajiCalculator
 {
-    public function calculate(User $guru, string $periode, float $jamMengajar): array
+    public function calculate(User $guru, float $jamMengajar, ?int $manualKehadiran = null): array
     {
         $komponen = $guru->komponenGaji;
-        $absensi = $guru->absensi()
-            ->where('tanggal', 'like', $periode . '%')
-            ->count();
+        $periode = now()->format('Y-m');
+        $absensiQuery = $guru->absensi()->where('tanggal', 'like', $periode . '%')->with('subject');
+        $absensiRecords = $absensiQuery->get();
+        $absensiCount = $manualKehadiran ?? $absensiRecords->count();
 
-        if ($absensi === 0) {
+        if ($absensiCount === 0 && $manualKehadiran === null) {
             throw new \RuntimeException('Gaji hanya dapat dihitung jika guru sudah melakukan absensi.');
         }
 
         $honorPerJam = $komponen?->honor_per_jam ?? 0;
+        $honorPerHadir = $komponen?->honor_per_hadir ?? 0;
         $transport = $komponen?->transport ?? 0;
         $bpjs = $komponen?->bpjs ?? 0;
         $potonganLain = $komponen?->potongan_lain ?? 0;
 
-        $totalHonor = round($jamMengajar * $honorPerJam, 2);
-        $totalTunjangan = round($transport + $bpjs, 2);
-        $totalPotongan = round($potonganLain, 2);
+        if ($honorPerHadir > 0) {
+            // honor per hadir is applied per attendance (per day)
+            $totalHonor = round($absensiCount * $honorPerHadir, 2);
+        } else {
+            // Sum total hours taught based on subjects attached to each attendance within the period
+            // If manual kehadiran override is provided with jamMengajar, prefer that as total hours
+            if ($manualKehadiran !== null && $jamMengajar > 0) {
+                $totalHours = $jamMengajar;
+            } else {
+                $totalHours = $absensiRecords->reduce(function ($carry, $rec) {
+                    $jam = 0;
+                    if ($rec->relationLoaded('subject') && $rec->subject) {
+                        $jam = (float) ($rec->subject->jam ?? 0);
+                    }
+                    return $carry + $jam;
+                }, 0.0);
+            }
+
+            $totalHonor = round($totalHours * $honorPerJam, 2);
+            // if jamMengajar parameter was zero or not provided, prefer computed totalHours
+            $jamMengajarUsed = ($jamMengajar > 0) ? $jamMengajar : $totalHours;
+        }
+        // Tunjangan: transport (and other monthly allowances if added later)
+        $totalTunjangan = round($transport, 2);
+        // Potongan: BPJS + potongan lain
+        $totalPotongan = round($bpjs + $potonganLain, 2);
+        // Final: honor + tunjangan - potongan
         $totalGaji = round($totalHonor + $totalTunjangan - $totalPotongan, 2);
+
+        // prepare absensi detail array (dates and subjects)
+        $absensiDetail = $absensiRecords->map(function ($rec) {
+            return [
+                'tanggal' => optional($rec->tanggal)->toDateString(),
+                'jam_masuk' => $rec->jam_masuk ?? null,
+                'subject' => $rec->relationLoaded('subject') && $rec->subject ? ['id' => $rec->subject->id, 'name' => $rec->subject->name, 'jam' => $rec->subject->jam] : null,
+            ];
+        })->toArray();
 
         return [
             'user_id' => $guru->id,
-            'periode' => $periode,
-            'jam_mengajar' => $jamMengajar,
+            'jam_mengajar' => $jamMengajarUsed ?? $jamMengajar,
             'honor_per_jam' => $honorPerJam,
             'total_honor' => $totalHonor,
             'total_tunjangan' => $totalTunjangan,
             'total_potongan' => $totalPotongan,
             'total_gaji' => $totalGaji,
-            'kehadiran' => $absensi,
+            'kehadiran' => $absensiCount,
             'detail' => [
-                'absensi' => $absensi,
+                'absensi' => $absensiDetail,
                 'honor' => $totalHonor,
                 'transport' => $transport,
                 'bpjs' => $bpjs,
@@ -49,12 +83,17 @@ class GajiCalculator
         ];
     }
 
-    public function store(User $guru, string $periode, float $jamMengajar): Gaji
+    public function store(User $guru, float $jamMengajar, ?int $manualKehadiran = null, ?string $bulan = null, ?int $subjectId = null): Gaji
     {
-        $payload = $this->calculate($guru, $periode, $jamMengajar);
+        $periode = $bulan ?? now()->format('Y-m');
+        $payload = $this->calculate($guru, $jamMengajar, $manualKehadiran);
+        $payload['bulan'] = $periode;
+        if ($subjectId) {
+            $payload['subject_id'] = $subjectId;
+        }
 
         return Gaji::updateOrCreate(
-            ['user_id' => $guru->id, 'periode' => $periode],
+            ['user_id' => $guru->id, 'bulan' => $periode],
             $payload
         );
     }

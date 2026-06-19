@@ -21,9 +21,10 @@ class AbsensiSetting extends Model
     protected function casts(): array
     {
         return [
-            'jam_mulai' => 'time',
-            'jam_selesai' => 'time',
-            'batas_absen' => 'time',
+            'jam_mulai' => 'datetime:H:i',
+            'jam_selesai' => 'datetime:H:i',
+            'batas_absen' => 'datetime:H:i',
+            'tanggal' => 'date',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'radius_meter' => 'integer',

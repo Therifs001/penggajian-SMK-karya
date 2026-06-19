@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'alasan',
     'latitude',
     'longitude',
+    'subject_id',
     'approved',
 ])]
 class Absensi extends Model
@@ -36,5 +37,10 @@ class Absensi extends Model
     public function guru(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Subject::class, 'subject_id');
     }
 }

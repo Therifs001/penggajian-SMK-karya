@@ -1,50 +1,4 @@
-@extends('layouts.app')
 
-@section('content')
-    <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
-        <h2 class="text-2xl font-semibold mb-4">Register</h2>
-        <form action="{{ route('register.perform') }}" method="POST">
-            @csrf
-            <div class="mb-4">
-                <label class="block font-medium">Nama</label>
-                <input type="text" name="name" value="{{ old('name') }}" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">NIP</label>
-                <input type="text" name="nip" value="{{ old('nip') }}" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Mata Pelajaran</label>
-                <input type="text" name="matapelajaran" value="{{ old('matapelajaran') }}" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Status</label>
-                <input type="text" name="status" value="{{ old('status') }}" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Role</label>
-                <select name="role" class="w-full border rounded p-2" required>
-                    <option value="guru" {{ old('role') == 'guru' ? 'selected' : '' }}>Guru</option>
-                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Password</label>
-                <input type="password" name="password" class="w-full border rounded p-2" required>
-            </div>
-            <div class="mb-4">
-                <label class="block font-medium">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation" class="w-full border rounded p-2" required>
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">Register</button>
-        </form>
-        <p class="mt-4 text-center">Sudah punya akun? <a href="{{ route('login') }}" class="text-blue-600">Login</a></p>
-    </div>
-@endsection<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -72,9 +26,38 @@
             border-radius: 20px;
             padding: 40px;
             width: 100%;
-            max-width: 450px;
+            max-width: 720px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             animation: fadeInUp 0.8s ease;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .register-card {
+                max-width: 640px;
+                padding: 32px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .register-card {
+                max-width: 95%;
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            .logo {
+                width: 48px;
+                margin-bottom: 10px;
+            }
+
+            .form-control {
+                padding: 10px;
+            }
+
+            .btn-register {
+                padding: 10px;
+            }
         }
 
         .form-control {
@@ -136,28 +119,15 @@
             <!-- NAMA -->
             <div class="mb-3 text-start">
                 <label class="form-label">Nama Lengkap</label>
-                <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
+                <input type="text" name="name" value="{{ old('name') }}" class="form-control" required autocomplete="name">
             </div>
 
             <div class="mb-3 text-start">
                 <label class="form-label">NIP / Id Guru</label>
-                <input type="text" name="nip" value="{{ old('nip') }}" class="form-control" required>
+                <input type="text" name="nip" value="{{ old('nip') }}" class="form-control" required autocomplete="off">
             </div>
 
-            <div class="mb-3 text-start">
-                <label class="form-label">Mata pelajaran</label>
-                <input type="text" name="matapelajaran" value="{{ old('matapelajaran') }}" class="form-control"
-                    required>
-            </div>
-
-            <div class="mb-3 text-start">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-control" required>
-                    <option value="">-- Pilih Status --</option>
-                    <option value="tetap" {{ old('status') == 'tetap' ? 'selected' : '' }}>Tetap</option>
-                    <option value="kontrak" {{ old('status') == 'kontrak' ? 'selected' : '' }}>Kontrak</option>
-                </select>
-            </div>
+            <!-- Mata pelajaran dan Status dihapus -->
 
             <div class="mb-3 text-start">
                 <label class="form-label">Role</label>
@@ -168,10 +138,18 @@
                 </select>
             </div>
 
+            <div class="mb-3 text-start" id="subjects-wrapper" style="display:none;">
+                <label class="form-label">Mata Pelajaran (untuk Guru)</label>
+                <select id="subjects-select" class="form-control" multiple></select>
+                <input type="hidden" name="matapelajaran" id="matapelajaran" value="">
+            </div>
+
+            <input type="hidden" name="status" id="status" value="aktif">
+
             <!-- EMAIL -->
             <div class="mb-3 text-start">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" class="form-control" required>
+                <input type="email" name="email" value="{{ old('email') }}" class="form-control" required autocomplete="email">
             </div>
 
             <!-- PASSWORD -->
@@ -213,6 +191,67 @@
     <!-- JS -->
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/aos/aos.js') }}"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        $(function(){
+            // initialize Select2 with existing subjects from server
+            var subjects = [];
+            @if(isset($subjects))
+                @foreach($subjects as $s)
+                    subjects.push({ id: '{{ $s->id }}', text: '{{ addslashes($s->name) }}' });
+                @endforeach
+            @endif
+
+            $('#subjects-select').select2({
+                data: subjects,
+                tags: true,
+                tokenSeparators: [','],
+                width: '100%'
+            });
+
+            // If old matapelajaran exists (validation error), pre-select them
+            @if(old('matapelajaran'))
+                var oldMat = "{{ addslashes(old('matapelajaran')) }}".split(/,\s*/).filter(Boolean);
+                // ensure options exist for each old value
+                oldMat.forEach(function(v){
+                    var found = $('#subjects-select').find('option').filter(function(){ return $(this).text() === v || $(this).val() === v; }).first();
+                    if (!found.length) {
+                        var newOpt = new Option(v, v, true, true);
+                        $('#subjects-select').append(newOpt);
+                    } else {
+                        found.prop('selected', true);
+                    }
+                });
+                $('#subjects-select').trigger('change');
+            @endif
+
+            // show/hide subjects when role changes
+            $('select[name="role"]').on('change', function(){
+                if ($(this).val() === 'guru') {
+                    $('#subjects-wrapper').show();
+                } else {
+                    $('#subjects-wrapper').hide();
+                    $('#subjects-select').val(null).trigger('change');
+                }
+            }).trigger('change');
+
+            // before submit, serialize selected subjects into hidden matapelajaran
+            $('form').on('submit', function(){
+                var vals = $('#subjects-select').val() || [];
+                // join by comma
+                $('#matapelajaran').val(vals.join(', '));
+            });
+        });
+    </script>
 
     <script>
         AOS.init({

@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->role === 'guru';
     }
+
+    public function subjects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Subject::class, 'subject_user')->withTimestamps();
+    }
 }

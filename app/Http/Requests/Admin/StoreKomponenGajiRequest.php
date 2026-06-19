@@ -16,6 +16,7 @@ class StoreKomponenGajiRequest extends FormRequest
         return [
             'user_id' => 'required|exists:users,id',
             'honor_per_jam' => 'required|numeric|min:0',
+            'honor_per_hadir' => 'nullable|numeric|min:0',
             'transport' => 'required|numeric|min:0',
             'bpjs' => 'required|numeric|min:0',
             'potongan_lain' => 'nullable|numeric|min:0',

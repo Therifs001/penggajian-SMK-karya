@@ -15,8 +15,9 @@ class StoreGajiRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id',
-            'periode' => 'required|string|date_format:Y-m',
             'jam_mengajar' => 'required|numeric|min:0',
+            'kehadiran' => 'nullable|integer|min:0',
+            'subject_id' => 'nullable|exists:subjects,id',
         ];
     }
 }

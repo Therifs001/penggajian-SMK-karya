@@ -12,7 +12,7 @@ class GajiController extends Controller
     {
         $gurus = Auth::user();
         $history = Gaji::where('user_id', $gurus->id)
-            ->latest('periode')
+            ->latest()
             ->paginate(15);
 
         return view('guru.gaji.index', compact('history'));

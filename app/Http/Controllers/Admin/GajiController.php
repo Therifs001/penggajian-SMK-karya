@@ -15,47 +15,39 @@ class GajiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Gaji::with('guru');
-
-        if ($request->filled('guru_id')) {
-            $query->where('user_id', $request->guru_id);
-        }
-
-        if ($request->filled('periode')) {
-            $query->where('periode', $request->periode);
-        }
-
-        $gajis = $query->latest()->paginate(15);
-        $gurus = User::where('role', 'guru')->orderBy('name')->get();
-
-        return view('admin.gaji.index', compact('gajis', 'gurus'));
+        return redirect()->route('admin.gaji-report.index');
     }
 
     public function create()
     {
-        $gurus = User::where('role', 'guru')->orderBy('name')->get();
-
-        return view('admin.gaji.create', compact('gurus'));
+        return redirect()->route('admin.gaji-report.index');
     }
 
     public function store(StoreGajiRequest $request, GajiCalculator $calculator)
     {
         $guru = User::findOrFail($request->user_id);
 
-        $gaji = $calculator->store($guru, $request->periode, (float) $request->jam_mengajar);
+        $manualKehadiran = $request->filled('kehadiran') ? (int) $request->kehadiran : null;
 
-        return redirect()->route('admin.gaji.show', $gaji)->with('success', 'Perhitungan gaji berhasil disimpan.');
+        $subjectId = $request->filled('subject_id') ? (int) $request->subject_id : null;
+
+        try {
+            $calculator->store($guru, (float) $request->jam_mengajar, $manualKehadiran, null, $subjectId);
+            return redirect()->route('admin.gaji-report.index')->with('success', 'Perhitungan gaji berhasil disimpan.');
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.gaji-report.index')->with('error', 'Gagal menghitung gaji: ' . $e->getMessage());
+        }
     }
 
     public function show(Gaji $gaji)
     {
-        return view('admin.gaji.show', compact('gaji'));
+        return redirect()->route('admin.gaji-report.index');
     }
 
     public function slipPdf(Gaji $gaji)
     {
         $pdf = Pdf::loadView('gaji.pdf-slip', compact('gaji'));
 
-        return $pdf->download("slip-gaji-{$gaji->guru->name}-{$gaji->periode}.pdf");
+        return $pdf->download("slip-gaji-{$gaji->guru->name}-{$gaji->id}.pdf");
     }
 }

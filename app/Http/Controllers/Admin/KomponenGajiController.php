@@ -25,9 +25,16 @@ class KomponenGajiController extends Controller
 
     public function store(StoreKomponenGajiRequest $request)
     {
+        $data = $request->validated();
+        $data['honor_per_hadir'] = $data['honor_per_hadir'] ?? 0;
+        $data['honor_per_jam'] = $data['honor_per_jam'] ?? 0;
+        $data['transport'] = $data['transport'] ?? 0;
+        $data['bpjs'] = $data['bpjs'] ?? 0;
+        $data['potongan_lain'] = $data['potongan_lain'] ?? 0;
+
         KomponenGaji::updateOrCreate(
             ['user_id' => $request->user_id],
-            $request->validated()
+            $data
         );
 
         return redirect()->route('admin.komponen-gaji.index')->with('success', 'Komponen gaji berhasil disimpan.');
@@ -42,7 +49,14 @@ class KomponenGajiController extends Controller
 
     public function update(StoreKomponenGajiRequest $request, KomponenGaji $komponen_gaji)
     {
-        $komponen_gaji->update($request->validated());
+        $data = $request->validated();
+        $data['honor_per_hadir'] = $data['honor_per_hadir'] ?? 0;
+        $data['honor_per_jam'] = $data['honor_per_jam'] ?? 0;
+        $data['transport'] = $data['transport'] ?? 0;
+        $data['bpjs'] = $data['bpjs'] ?? 0;
+        $data['potongan_lain'] = $data['potongan_lain'] ?? 0;
+
+        $komponen_gaji->update($data);
 
         return redirect()->route('admin.komponen-gaji.index')->with('success', 'Komponen gaji berhasil diperbarui.');
     }

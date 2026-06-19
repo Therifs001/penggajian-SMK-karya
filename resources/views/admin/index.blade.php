@@ -20,12 +20,12 @@
             <div class="small-box bg-success">
                 <div class="inner">
                     <h3>{{ \App\Models\Gaji::count() }}</h3>
-                    <p>Total Slip Gaji</p>
+                    <p>laporan</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-file-invoice-dollar"></i>
                 </div>
-                <a href="{{ route('admin.gaji.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="{{ route('admin.gaji-report.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -37,7 +37,7 @@
                 <div class="icon">
                     <i class="fas fa-calendar-check"></i>
                 </div>
-                <a href="{{ route('admin.absensi-setting.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="{{ route('admin.absensi-report.index') }}" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -107,7 +107,31 @@
                     <a href="{{ route('admin.guru.index') }}" class="btn btn-primary btn-block mb-2"><i class="fas fa-users mr-2"></i> Kelola Guru</a>
                     <a href="{{ route('admin.komponen-gaji.index') }}" class="btn btn-success btn-block mb-2"><i class="fas fa-money-bill-wave mr-2"></i> Komponen Gaji</a>
                     <a href="{{ route('admin.absensi-setting.index') }}" class="btn btn-warning btn-block mb-2"><i class="fas fa-calendar-alt mr-2"></i> Atur Absensi</a>
-                    <a href="{{ route('admin.gaji.index') }}" class="btn btn-danger btn-block"><i class="fas fa-file-invoice-dollar mr-2"></i> Hitung Gaji</a>
+                    <a href="{{ route('admin.gaji-report.index') }}" class="btn btn-danger btn-block"><i class="fas fa-file-invoice-dollar mr-2"></i> laporan</a>
+                </div>
+            </div>
+            @php
+                $activeSetting = \App\Models\AbsensiSetting::where('active', true)->latest()->first();
+            @endphp
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Status Absensi</h3>
+                </div>
+                <div class="card-body">
+                    @if($activeSetting)
+                        <p><strong>Status:</strong> <span class="text-success">Aktif</span></p>
+                        <p><strong>Jam Mulai:</strong> {{ optional($activeSetting->jam_mulai)->format('H:i') ?? '-' }}</p>
+                        <p><strong>Batas Absen:</strong> {{ optional($activeSetting->batas_absen)->format('H:i') ?? '-' }}</p>
+                        <p><strong>Radius:</strong> {{ $activeSetting->radius_meter ?? '-' }} meter</p>
+                        <p><strong>Lokasi:</strong> {{ $activeSetting->latitude ?? '-' }}, {{ $activeSetting->longitude ?? '-' }}</p>
+                        <form action="{{ route('admin.absensi-setting.deactivate') }}" method="POST" class="mt-3">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-block">Non-aktifkan Pengaturan Absensi</button>
+                        </form>
+                    @else
+                        <p><strong>Status:</strong> <span class="text-muted">Non-aktif</span></p>
+                        <p>Tidak ada pengaturan absensi aktif. <a href="{{ route('admin.absensi-setting.index') }}">Atur sekarang</a>.</p>
+                    @endif
                 </div>
             </div>
         </div>

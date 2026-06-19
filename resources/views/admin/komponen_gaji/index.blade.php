@@ -19,8 +19,10 @@
                         <tr>
                             <th>Guru</th>
                             <th>Honor/Jam</th>
+                            <th>Honor/Hadir</th>
                             <th>Transport</th>
                             <th>BPJS</th>
+                            <th>Potongan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -29,8 +31,10 @@
                             <tr>
                                 <td>{{ $komponen->guru->name }}</td>
                                 <td>Rp {{ number_format($komponen->honor_per_jam, 0, ',', '.') }}</td>
+                                <td>{{ $komponen->honor_per_hadir ? 'Rp ' . number_format($komponen->honor_per_hadir, 0, ',', '.') : '-' }}</td>
                                 <td>Rp {{ number_format($komponen->transport, 0, ',', '.') }}</td>
                                 <td>Rp {{ number_format($komponen->bpjs, 0, ',', '.') }}</td>
+                                <td>{{ $komponen->potongan_lain ? 'Rp ' . number_format($komponen->potongan_lain, 0, ',', '.') : '-' }}</td>
                                 <td>
                                     <a href="{{ route('admin.komponen-gaji.edit', $komponen) }}" class='btn btn-sm btn-info'>
                                         <i class='fas fa-edit'></i> Edit

@@ -13,13 +13,15 @@ class GuruController extends Controller
     public function index()
     {
         $gurus = User::where('role', 'guru')->latest()->paginate(15);
+        $subjects = \App\Models\Subject::all();
 
-        return view('admin.guru.index', compact('gurus'));
+        return view('admin.guru.index', compact('gurus', 'subjects'));
     }
 
     public function create()
     {
-        return view('admin.guru.create');
+        $subjects = \App\Models\Subject::all();
+        return view('admin.guru.create', compact('subjects'));
     }
 
     public function store(StoreGuruRequest $request)
@@ -28,7 +30,26 @@ class GuruController extends Controller
         $data['role'] = 'guru';
         $data['password'] = Hash::make($data['password'] ?? 'password');
 
-        User::create($data);
+        $subjectsInput = $request->input('subjects', []);
+
+        $guru = User::create($data);
+
+        // subjectsInput can contain numeric IDs or new string names (from Select2 tags)
+        $ids = [];
+        foreach ($subjectsInput as $item) {
+            if (is_numeric($item)) {
+                $s = \App\Models\Subject::find($item);
+                if ($s) $ids[] = $s->id;
+            } else {
+                $name = trim($item);
+                if ($name === '') continue;
+                $s = \App\Models\Subject::firstOrCreate(['name' => $name], ['jam' => 0]);
+                $ids[] = $s->id;
+            }
+        }
+        if (! empty($ids)) {
+            $guru->subjects()->sync($ids);
+        }
 
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil disimpan.');
     }
@@ -39,7 +60,8 @@ class GuruController extends Controller
             abort(404);
         }
 
-        return view('admin.guru.edit', compact('guru'));
+        $subjects = \App\Models\Subject::all();
+        return view('admin.guru.edit', compact('guru', 'subjects'));
     }
 
     public function update(UpdateGuruRequest $request, User $guru)
@@ -56,7 +78,27 @@ class GuruController extends Controller
             unset($data['password']);
         }
 
+        $subjectsInput = $request->input('subjects', []);
+
         $guru->update($data);
+
+        $ids = [];
+        foreach ($subjectsInput as $item) {
+            if (is_numeric($item)) {
+                $s = \App\Models\Subject::find($item);
+                if ($s) $ids[] = $s->id;
+            } else {
+                $name = trim($item);
+                if ($name === '') continue;
+                $s = \App\Models\Subject::firstOrCreate(['name' => $name], ['jam' => 0]);
+                $ids[] = $s->id;
+            }
+        }
+        if (! empty($ids)) {
+            $guru->subjects()->sync($ids);
+        } else {
+            $guru->subjects()->detach();
+        }
 
         return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil diperbarui.');
     }

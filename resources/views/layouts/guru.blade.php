@@ -24,13 +24,17 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-link nav-link">Logout</button>
-                </form>
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="fas fa-user"></i> {{ auth()->user()->name ?? '' }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                </div>
             </li>
         </ul>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">@csrf</form>
+
     </nav>
 
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -63,18 +67,7 @@
                             <p>Absensi</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('guru.gaji.index') }}" class="nav-link {{ request()->routeIs('guru.gaji.index') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            <p>Slip Gaji</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('guru.gaji.index') }}" class="nav-link {{ request()->routeIs('guru.gaji.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-history"></i>
-                            <p>Riwayat Gaji</p>
-                        </a>
-                    </li>
+                    
                 </ul>
             </nav>
         </div>

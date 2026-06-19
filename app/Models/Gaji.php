@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[\Illuminate\Database\Eloquent\Attributes\Fillable([
     'user_id',
-    'periode',
+    'bulan',
+    'subject_id',
     'jam_mengajar',
     'honor_per_jam',
     'total_honor',

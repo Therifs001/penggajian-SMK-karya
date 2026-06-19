@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\AbsensiSettingController;
+use App\Http\Controllers\Admin\AbsensiReportController;
 use App\Http\Controllers\Admin\GajiController;
+use App\Http\Controllers\Admin\GajiReportController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KomponenGajiController;
 use App\Http\Controllers\Guru\AbsensiController as GuruAbsensiController;
@@ -21,30 +24,35 @@ Route::get('/test-login', function () {
     return 'User not found';
 });
 
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
 Route::get('/register', function () {
-    return view('auth.register');
+    $subjects = \App\Models\Subject::all();
+    return view('auth.register', compact('subjects'));
 })->name('register');
 
 Route::post('/register', function (Request $request) {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'nip' => 'required|string|max:255',
-        'matapelajaran' => 'required|string|max:255',
-        'status' => 'required|string|max:255',
         'role' => 'required|in:admin,guru',
         'email' => 'required|email|max:255|unique:users,email',
         'password' => 'required|string|min:8|confirmed',
     ]);
 
+    // `matapelajaran` and `status` removed from required fields in the form,
+    // but DB columns are non-nullable; set defaults when not provided.
     User::create([
         'name' => $validated['name'],
         'nip' => $validated['nip'],
-        'matapelajaran' => $validated['matapelajaran'],
-        'status' => $validated['status'],
+        'matapelajaran' => $request->input('matapelajaran', ''),
+        'status' => $request->input('status', ''),
         'role' => $validated['role'],
         'email' => $validated['email'],
         'password' => Hash::make($validated['password']),
@@ -85,9 +93,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     })->name('index');
     Route::resource('guru', GuruController::class);
     Route::resource('komponen-gaji', KomponenGajiController::class);
+    Route::resource('subjects', SubjectController::class)->except(['show']);
     Route::resource('absensi-setting', AbsensiSettingController::class)->only(['index', 'store']);
-    Route::resource('gaji', GajiController::class)->only(['index', 'create', 'store', 'show']);
-    Route::get('gaji/{gaji}/slip-pdf', [GajiController::class, 'slipPdf'])->name('gaji.slip-pdf');
+    Route::post('absensi-setting/deactivate', [AbsensiSettingController::class, 'deactivate'])->name('absensi-setting.deactivate');
+    Route::get('absensi-report', [AbsensiReportController::class, 'index'])->name('absensi-report.index');
+    // Penggajian UI dihapus; gunakan laporan gaji
+    Route::get('gaji-report', [GajiReportController::class, 'index'])->name('gaji-report.index');
+    Route::get('gaji-report/print', [GajiReportController::class, 'print'])->name('gaji-report.print');
+    Route::delete('gaji-report/{gaji}', [GajiReportController::class, 'destroy'])->name('gaji-report.destroy');
 });
 
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {

@@ -23,12 +23,20 @@
                     <input type='number' name='honor_per_jam' step='0.01' class='form-control' required>
                 </div>
                 <div class='form-group'>
+                    <label>Honor per Hadir (opsional)</label>
+                    <input type='number' name='honor_per_hadir' step='0.01' class='form-control' placeholder='Kosongkan jika menggunakan Honor per Jam'>
+                </div>
+                <div class='form-group'>
                     <label>Transport</label>
                     <input type='number' name='transport' step='0.01' class='form-control' required>
                 </div>
                 <div class='form-group'>
                     <label>BPJS</label>
                     <input type='number' name='bpjs' step='0.01' class='form-control' required>
+                </div>
+                <div class='form-group'>
+                    <label>Potongan Lain (opsional)</label>
+                    <input type='number' name='potongan_lain' step='0.01' class='form-control' placeholder='Masukkan jumlah potongan lain jika ada'>
                 </div>
             </div>
             <div class='card-footer'>

@@ -16,6 +16,8 @@ class StoreAbsensiRequest extends FormRequest
         return [
             'status' => 'required|in:hadir,izin',
             'alasan' => 'required_if:status,izin|nullable|string|max:500',
+            'subjects' => 'array',
+            'subjects.*' => 'nullable|exists:subjects,id',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ];

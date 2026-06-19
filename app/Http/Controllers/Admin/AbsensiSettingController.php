@@ -24,4 +24,16 @@ class AbsensiSettingController extends Controller
 
         return redirect()->route('admin.absensi-setting.index')->with('success', 'Pengaturan absensi berhasil diperbarui.');
     }
+
+    public function deactivate()
+    {
+        $setting = AbsensiSetting::where('active', true)->latest()->first();
+        if ($setting) {
+            $setting->active = false;
+            $setting->save();
+            return redirect()->route('admin.index')->with('success', 'Pengaturan absensi berhasil dinonaktifkan.');
+        }
+
+        return redirect()->route('admin.index')->with('warning', 'Tidak ada pengaturan absensi aktif untuk dinonaktifkan.');
+    }
 }

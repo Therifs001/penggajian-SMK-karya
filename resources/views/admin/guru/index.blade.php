@@ -26,7 +26,7 @@
                             <tr>
                                 <td>{{ $guru->nip }}</td>
                                 <td>{{ $guru->name }}</td>
-                                <td>{{ $guru->matapelajaran }}</td>
+                                <td>{{ $guru->subjects->pluck('name')->join(', ') }}</td>
                                 <td>{{ ucfirst($guru->status) }}</td>
                                 <td>{{ $guru->email }}</td>
                                 <td>
@@ -69,8 +69,12 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="matapelajaran">Mata Pelajaran</label>
-                                <input type="text" name="matapelajaran" id="matapelajaran" class="form-control" required>
+                                <label for="subjects">Mata Pelajaran</label>
+                                <select name="subjects[]" id="subjects-select" class="form-control" multiple required>
+                                    @foreach($subjects as $sub)
+                                        <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="email">Email</label>
@@ -88,6 +92,10 @@
                             <div class="form-group col-md-6">
                                 <label for="password">Password</label>
                                 <input type="password" name="password" id="password" class="form-control" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="password_confirmation">Konfirmasi Password</label>
+                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -108,11 +116,19 @@
 @push('scripts')
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(function () {
             $('#guruTable').DataTable({
                 responsive: true,
                 autoWidth: false,
+            });
+            $('#subjects-select').select2({
+                tags: true,
+                tokenSeparators: [','],
+                width: '100%'
             });
         });
     </script>

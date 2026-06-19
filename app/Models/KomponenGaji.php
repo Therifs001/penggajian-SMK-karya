@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[\Illuminate\Database\Eloquent\Attributes\Fillable([
     'user_id',
     'honor_per_jam',
+    'honor_per_hadir',
     'transport',
     'bpjs',
     'potongan_lain',
-    'periode',
+    
 ])]
 class KomponenGaji extends Model
 {
@@ -24,6 +25,7 @@ class KomponenGaji extends Model
     {
         return [
             'honor_per_jam' => 'decimal:2',
+            'honor_per_hadir' => 'decimal:2',
             'transport' => 'decimal:2',
             'bpjs' => 'decimal:2',
             'potongan_lain' => 'decimal:2',
