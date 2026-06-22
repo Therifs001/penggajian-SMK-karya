@@ -32,7 +32,7 @@
   <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
     <a href="{{ url('/') }}" class="logo d-flex align-items-center">
-      <img src="{{ asset('assets/img/logo.png') }}">
+      <img src="{{ asset('assets/img/smkkarya.jpeg') }}">
       <h1 class="sitename ms-2">SMK Karya Pembangunan Cicalengka</h1>
     </a>
 
@@ -58,7 +58,7 @@
 
   <!-- Background Image -->
   <div class="hero-bg">
-    <img src="{{ asset('assets/img/about-company-1.jpg') }}" alt="">
+    <img src="{{ asset('assets/img/smkkarya.jpeg') }}" alt="">
   </div>
 
   <div class="container text-center">

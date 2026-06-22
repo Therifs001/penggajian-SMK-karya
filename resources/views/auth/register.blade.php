@@ -98,7 +98,7 @@
 
     <div class="register-card text-center" data-aos="zoom-in">
 
-        <img src="{{ asset('assets/img/logo.png') }}" class="logo">
+        <img src="{{ asset('assets/img/smkkarya.jpeg') }}" class="logo">
 
         <h3 class="fw-bold">Registrasi Guru</h3>
         <p class="text-muted mb-4">Buat akun untuk mengakses sistem penggajian</p>

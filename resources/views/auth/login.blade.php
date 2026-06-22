@@ -72,7 +72,7 @@
 
     <div class="login-card text-center" data-aos="zoom-in">
 
-        <img src="{{ asset('assets/img/logo.png') }}" class="logo">
+        <img src="{{ asset('assets/img/smkkarya.jpeg') }}" class="logo">
 
         <h3>Login</h3>
         <p class="text-muted mb-4">Sistem Penggajian Guru</p>
