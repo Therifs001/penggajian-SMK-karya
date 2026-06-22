@@ -75,7 +75,7 @@
       Memudahkan pengelolaan gaji guru secara cepat, transparan, dan akurat.
     </p>
 
-    <a href="#login"
+    <a href="{{ route('login') }}"
        class="btn-get-started"
        data-aos="zoom-in"
        data-aos-delay="600">
