@@ -27,7 +27,7 @@ class AbsensiController extends Controller
     {
         $setting = AbsensiSetting::where('active', true)->latest()->first();
 
-        if (! $setting) {
+        if (!$setting) {
             return back()->withErrors(['absensi' => 'Pengaturan absensi belum diaktifkan oleh admin.']);
         }
 
@@ -99,19 +99,30 @@ class AbsensiController extends Controller
         } else {
             // If subjects selected, create or reuse a single Absensi record for today,
             // and compute total jam taught from selected subjects to feed the payroll calculator.
-            $absensi = $guru->absensi()->whereDate('tanggal', Carbon::today())->first();
-            if (! $absensi) {
+            $absensi = $guru->absensi()
+                ->whereDate('tanggal', Carbon::today())
+                ->first();
+
+            if (!$absensi) {
+
                 $absensi = Absensi::create([
                     'user_id' => $guru->id,
                     'tanggal' => $now->toDateString(),
                     'jam_masuk' => $now->format('H:i'),
-                    'subject_id' => null,
+                    'subject_id' => $selectedSubjects[0] ?? null,
                     'status' => $request->status,
                     'alasan' => $request->alasan,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
                     'approved' => true,
                 ]);
+
+            } else {
+
+                $absensi->update([
+                    'subject_id' => $selectedSubjects[0] ?? null,
+                ]);
+
             }
 
             // compute total jam from selected subjects

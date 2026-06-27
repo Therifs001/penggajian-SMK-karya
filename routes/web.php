@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Guru\DashboardController;
+use App\Http\Controllers\Guru\ProfileController;
+use App\Http\Controllers\Guru\SlipGajiController;
 
 Route::get('/test-login', function () {
     $user = \App\Models\User::where('email', 'admin@example.com')->first();
@@ -104,11 +107,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
-    Route::get('/', function () {
-        return view('guru.index');
-    })->name('index');
+    Route::get('/', [DashboardController::class, 'index'])
+    ->name('index');
     Route::get('absensi', [GuruAbsensiController::class, 'index'])->name('absensi.index');
     Route::post('absensi', [GuruAbsensiController::class, 'store'])->name('absensi.store');
     Route::get('gaji', [GuruGajiController::class, 'index'])->name('gaji.index');
     Route::get('gaji/{gaji}', [GuruGajiController::class, 'show'])->name('gaji.show');
 });
+
+Route::post('/guru/profile/photo', [ProfileController::class, 'updatePhoto'])
+    ->name('guru.profile.photo');
+
+Route::get('/slip-gaji/{gaji}/pdf', [SlipGajiController::class, 'pdf'])
+    ->name('guru.slip-gaji.pdf');

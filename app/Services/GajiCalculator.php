@@ -25,31 +25,38 @@ class GajiCalculator
         $transport = $komponen?->transport ?? 0;
         $bpjs = $komponen?->bpjs ?? 0;
         $potonganLain = $komponen?->potongan_lain ?? 0;
-
         if ($honorPerHadir > 0) {
-            // honor per hadir is applied per attendance (per day)
-            $totalHonor = round($absensiCount * $honorPerHadir, 2);
-        } else {
-            // Sum total hours taught based on subjects attached to each attendance within the period
-            // If manual kehadiran override is provided with jamMengajar, prefer that as total hours
-            if ($manualKehadiran !== null && $jamMengajar > 0) {
-                $totalHours = $jamMengajar;
-            } else {
-                $totalHours = $absensiRecords->reduce(function ($carry, $rec) {
-                    $jam = 0;
-                    if ($rec->relationLoaded('subject') && $rec->subject) {
-                        $jam = (float) ($rec->subject->jam ?? 0);
-                    }
-                    return $carry + $jam;
-                }, 0.0);
-            }
 
-            $totalHonor = round($totalHours * $honorPerJam, 2);
-            // if jamMengajar parameter was zero or not provided, prefer computed totalHours
-            $jamMengajarUsed = ($jamMengajar > 0) ? $jamMengajar : $totalHours;
+            $totalHonor = round($absensiCount * $honorPerHadir, 2);
+            $jamMengajarUsed = $jamMengajar;
+
+        } else {
+
+            $totalHours = $absensiRecords->reduce(function ($carry, $rec) {
+                if (!$rec->subject) {
+                    return $carry;
+                }
+
+                return $carry + (float) ($rec->subject->jam ?? 0);
+            }, 0);
+
+            $totalHonor = $absensiRecords->reduce(function ($carry, $rec) use ($honorPerJam) {
+                if (!$rec->subject) {
+                    return $carry;
+                }
+
+                $jam = (float) ($rec->subject->jam ?? 0);
+
+                return $carry + ($jam * $honorPerJam);
+            }, 0);
+
+            $totalHonor = round($totalHonor, 2);
+
+            $jamMengajarUsed = $totalHours;
+
         }
         // Tunjangan: transport (and other monthly allowances if added later)
-        $totalTunjangan = round($transport, 2);
+        $totalTunjangan = round($transport * $absensiCount, 2);
         // Potongan: BPJS + potongan lain
         $totalPotongan = round($bpjs + $potonganLain, 2);
         // Final: honor + tunjangan - potongan
